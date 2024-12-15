@@ -16,7 +16,6 @@ Dieser Workaround aktualisiert `<img>`-Elemente in Widgets mithilfe eines Script
 - Aktiviere in VIS-2 oben rechts die Option **"Show attributes"**, um die Tabs **SEITE**, **WIDGET**, **CSS** und **SCRIPTE** sichtbar zu machen.
 
 ### 2. Code einfügen
-- Öffne das betroffene Widget.
 - Wechsle in den Tab **SCRIPTE**.
 - Füge den JS Code ein.
 
