@@ -1,5 +1,5 @@
 # ioBroker - visWidgetUpdater
-# VIS-2 Bug Workaround: Automatische Aktualisierung von `<img>`-Elementen in Widgets
+### VIS-2 Bug Workaround: Automatische Aktualisierung von `<img>`-Elementen in Widgets
 
 Die aktuelle stabile Version von ioBroker VIS-2 (`v2.9.64`, Stand **November 2024**) enthält einen Bug, der die automatische Aktualisierung von `<img>`-Elementen in Widgets beeinträchtigt. Dies betrifft insbesondere Bildquellen wie Webcams oder dynamische URLs.
 
