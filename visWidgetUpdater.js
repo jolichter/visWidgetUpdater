@@ -1,3 +1,6 @@
+// ioBroker visWidgetUpdater.js
+// V 24.12.003
+
 const widgetData = {
     'w000501': {
         url: 'http://192.168.1.41:80/tmpfs/auto.jpg?usr=ioBroker&pwd=ioBroker', // Widget 1, Webcam 1
@@ -41,6 +44,22 @@ function updateWidget(widgetId) {
         logMessage(`Widget mit ID "${widgetId}" ist momentan nicht im DOM.`, 'warn');
         return; // Abbruch, wenn das Widget nicht im DOM ist
     }
+const loggingEnabled = false; // Setze auf true, um das Logging in der Konsole (F12) zu aktivieren
+
+// Funktion zum Schreiben von Logs (abhängig von loggingEnabled)
+function logMessage(message, level = 'info') {
+    if (loggingEnabled) {
+        console.log(`[${level.toUpperCase()}] ${message}`);
+    }
+}
+
+// Funktion zur Aktualisierung eines Widgets
+function updateWidget(widgetId) {
+    const widget = document.getElementById(widgetId);
+    if (!widget) {
+        logMessage(`Widget mit ID "${widgetId}" ist momentan nicht im DOM.`, 'warn');
+        return; // Abbruch, wenn das Widget nicht im DOM ist
+    }
 
     const img = widget.querySelector('img');
     if (!img) {
@@ -50,19 +69,20 @@ function updateWidget(widgetId) {
 
     const { url } = widgetData[widgetId];
     const newImg = new Image(); // Unsichtbares Bild zum Vorladen
-
     const separator = url.includes('?') ? '&' : '?'; // Prüfe, ob die URL bereits Query-Parameter enthält
+    const timestamp = new Date().getTime(); // Zeitstempel zur Cache-Vermeidung
+
+    // Vorladen des neuen Bildes
+    newImg.src = `${url}${separator}t=${timestamp}`;
 
     newImg.onload = () => {
         logMessage(`Bild für Widget "${widgetId}" erfolgreich geladen.`, 'info');
-        img.src = `${url}${separator}t=${new Date().getTime()}`; // Füge Zeitstempel hinzu
+        img.src = newImg.src; // Wechsle erst nach vollständigem Laden
     };
 
     newImg.onerror = () => {
         logMessage(`Bild für Widget "${widgetId}" konnte nicht geladen werden.`, 'error');
     };
-
-    newImg.src = `${url}${separator}t=${new Date().getTime()}`; // Löst das Laden aus
 }
 
 // Starte einen eigenen Timer für jedes Widget
