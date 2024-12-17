@@ -1,5 +1,5 @@
 // ioBroker visWidgetUpdater.js
-// V 24.12.003
+// V 24.12.004
 
 const widgetData = {
     'w000501': {
@@ -28,22 +28,6 @@ const widgetData = {
     }
 };
 
-const loggingEnabled = false; // Setze auf true, um das Logging in der Konsole (F12) zu aktivieren
-
-// Funktion zum Schreiben von Logs (abhängig von loggingEnabled)
-function logMessage(message, level = 'info') {
-    if (loggingEnabled) {
-        console.log(`[${level.toUpperCase()}] ${message}`);
-    }
-}
-
-// Funktion zur Aktualisierung eines Widgets
-function updateWidget(widgetId) {
-    const widget = document.getElementById(widgetId);
-    if (!widget) {
-        logMessage(`Widget mit ID "${widgetId}" ist momentan nicht im DOM.`, 'warn');
-        return; // Abbruch, wenn das Widget nicht im DOM ist
-    }
 const loggingEnabled = false; // Setze auf true, um das Logging in der Konsole (F12) zu aktivieren
 
 // Funktion zum Schreiben von Logs (abhängig von loggingEnabled)
