@@ -1,37 +1,19 @@
 // ioBroker visWidgetUpdater.js
-// V 25.01.005
+// V 25.01.006
 
-const widgetData = {
-    'w000501': {
-        url: 'http://192.168.1.41:80/tmpfs/auto.jpg?usr=USER&pwd=PASSWORT', // Widget 1, Webcam 1
-        interval: 2000 // Aktualisierungszeit in Millisekunden
-    },
-    'w000502': {
-        url: 'http://192.168.2.41:80/tmpfs/auto.jpg?usr=USER&pwd=PASSWORT', // Widget 2, gleiche Webcam 1
-        interval: 1000 // Aktualisierungszeit in Millisekunden
-    },
-    'w000503': {
-        url: 'http://192.168.1.42:80/tmpfs/auto.jpg?usr=USER&pwd=PASSWORT', // Widget 3, Webcam 2
-        interval: 2000 // Aktualisierungszeit in Millisekunden
-    },
-    'w000504': {
-        url: 'http://192.168.1.42:80/tmpfs/auto.jpg?usr=USER&pwd=PASSWORT', // Widget 4, gleiche Webcam 2
-        interval: 1000 // Aktualisierungszeit in Millisekunden
-    },
-    'w000505': {
-        url:  'http://192.168.1.43:80/tmpfs/auto.jpg?usr=USER&pwd=PASSWORT', // Widget 5, Webcam 3
-        interval: 2000 // Aktualisierungszeit in Millisekunden
-    },
-    'w000506': {
-        url: 'https://morgenwirdes.de/api/v3/gif6.php?plz=56068', // Widget 6, Regenradar
-        interval: 600000 // Aktualisierungszeit in Millisekunden
-    }
-};
+const loggingEnabled = false; // Setze auf true, um Logs zu deaktivieren
 
-const loggingEnabled = true;  // Logging aktivieren/deaktivieren
-const intervalIds = {};  // Zur Verwaltung der Intervalle
+// Konfiguration für Widgets: ID, Intervall und Aktivierungsstatus
+const widgetData = [
+    { id: 'w000501', interval: 2000, active: true }, // Widget-VIS2-Fenster1 webCam1
+    { id: 'w000502', interval: 2000, active: true }, // Widget-VIS2-Fenster1 webCam2
+    { id: 'w000503', interval: 1000, active: true }, // Widget-VIS2-Fenster1 webCam3
+    { id: 'w000701', interval: 2000, active: true }, // Widget-VIS2-Fenster2 webCam2
+    { id: 'w000702', interval: 2000, active: true }, // Widget-VIS2-Fenster2 webCam1
+    { id: 'w000101', interval: 6000000, active: true } // Widget-VIS2-Fenster2 Regenradar
+];
 
-// Funktion zum Schreiben von Logs (abhängig von loggingEnabled)
+// Funktion zum Schreiben von Logs
 function logMessage(message, level = 'info') {
     if (loggingEnabled) {
         console.log(`[${level.toUpperCase()}] ${message}`);
@@ -39,46 +21,61 @@ function logMessage(message, level = 'info') {
 }
 
 // Funktion zur Aktualisierung eines Widgets
-function updateWidget(widgetId) {
-    const widget = document.getElementById(widgetId);
-    if (!widget) {
-        logMessage(`Widget mit ID "${widgetId}" ist momentan nicht im DOM.`, 'warn');
+function updateWidget(widget) {
+    const widgetId = widget.id;
+    const widgetElement = document.getElementById(widgetId);
+    if (!widgetElement) {
+        logMessage(`Widget mit ID "${widgetId}" ist nicht im DOM.`, 'warn');
         return;
     }
 
-    const img = widget.querySelector('img');
+    const img = widgetElement.querySelector('img');
     if (!img) {
         logMessage(`Kein <img> Element in Widget "${widgetId}" gefunden.`, 'error');
         return;
     }
 
-    const { url } = widgetData[widgetId];
-    const newImg = new Image();
-    const separator = url.includes('?') ? '&' : '?';
-    const timestamp = new Date().getTime();
-
-    // Bild wird erst geladen, wenn onload und onerror definiert sind
-    newImg.onload = () => {
-        logMessage(`Bild für Widget "${widgetId}" erfolgreich geladen.`, 'info');
-        img.src = newImg.src;
-    };
-
-    newImg.onerror = (e) => {
-        logMessage(`Bild für Widget "${widgetId}" konnte nicht geladen werden. URL: ${newImg.src} Fehler: ${e.type}`, 'error');
-    };
-
-    newImg.src = `${url}${separator}t=${timestamp}`;
-}
-
-// Starte einen eigenen Timer für jedes Widget, doppelte Intervalle verhindern
-Object.keys(widgetData).forEach(widgetId => {
-    const { interval } = widgetData[widgetId];
-
-    // Vorherigen Timer stoppen, falls vorhanden
-    if (intervalIds[widgetId]) {
-        clearInterval(intervalIds[widgetId]);
+    // URL aus src lesen und Zeitstempel entfernen
+    let url = img.getAttribute('src');
+    if (!url) {
+        logMessage(`Keine URL in <img> für Widget "${widgetId}" gefunden.`, 'error');
+        return;
     }
 
-    logMessage(`Starte Update-Timer für Widget "${widgetId}" mit Intervall ${interval}ms.`, 'info');
-    intervalIds[widgetId] = setInterval(() => updateWidget(widgetId), interval);
+    // Entferne alte Zeitstempel
+    url = url.replace(/([?&])t=\d+/g, ''); // Entferne alte Zeitstempel
+    url = url.replace(/([?&])t=\d+/g, ''); // Zusätzliche Sicherheitsschleife
+
+    // Zusätzlicher Check auf ungültige URLs
+    if (!url || url.includes('undefined') || url.includes('null')) {
+        logMessage(`Ungültige URL nach Bereinigung für Widget "${widgetId}".`, 'error');
+        return;
+    }
+
+    logMessage(`Bereinigte URL für Widget "${widgetId}": ${url}`, 'debug');
+
+    const timestamp = new Date().getTime();
+    const separator = url.includes('?') ? '&' : '?';
+    const newUrl = `${url}${separator}t=${timestamp}`;
+
+    // Bild aktualisieren mit Fehlerüberwachung
+    img.onerror = () => {
+        logMessage(`Bild für Widget "${widgetId}" konnte nicht geladen werden. URL: ${newUrl}`, 'error');
+    };
+
+    img.onload = () => {
+        logMessage(`Bild für Widget "${widgetId}" erfolgreich aktualisiert: ${newUrl}`, 'info');
+    };
+
+    img.src = newUrl;
+}
+
+// Starte eigene Timer für jedes Widget, wenn aktiv
+widgetData.forEach(widget => {
+    if (widget.active) {
+        logMessage(`Starte Update-Timer für Widget "${widget.id}" mit Intervall ${widget.interval}ms.`, 'info');
+        setInterval(() => updateWidget(widget), widget.interval);
+    } else {
+        logMessage(`Widget "${widget.id}" ist deaktiviert. Kein Timer gestartet.`, 'info');
+    }
 });
