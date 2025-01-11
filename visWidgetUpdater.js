@@ -1,7 +1,7 @@
 // ioBroker visWidgetUpdater.js
-// V 25.01.006
+// V 25.01.006a
 
-const loggingEnabled = false; // Setze auf true, um Logs zu deaktivieren
+const loggingEnabled = false; // Setze auf true, um Logs zu aktivieren
 
 // Konfiguration für Widgets: ID, Intervall und Aktivierungsstatus
 const widgetData = [
