@@ -54,5 +54,6 @@ const widgetData = [
     { id: 'w000727', interval: 2000, active: true },  // Widget-Fenster2 webCam2
     { id: 'w000795', interval: 600000, active: true } // Widget-Fenster1 Regenradar
 ];
-
+```
+PrintScreen VIS2:
 ![demo_VIS2-BasicImage_Webcam](https://github.com/user-attachments/assets/83889a7c-05c9-476d-ba53-dcee450d1113)
