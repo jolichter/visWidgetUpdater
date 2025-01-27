@@ -51,6 +51,8 @@ Details zum Bug sind unter folgendem Link verfügbar:
 ```javascript
 const widgetData = [
     { id: 'w000556', interval: 4000, active: true },  // Widget-Fenster1 webCam1
-    { id: 'w000725', interval: 2000, active: true },  // Widget-Fenster2 webCam2
+    { id: 'w000727', interval: 2000, active: true },  // Widget-Fenster2 webCam2
     { id: 'w000795', interval: 600000, active: true } // Widget-Fenster1 Regenradar
 ];
+
+![demo_VIS2-BasicImage_Webcam](https://github.com/user-attachments/assets/83889a7c-05c9-476d-ba53-dcee450d1113)
